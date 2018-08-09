@@ -185,6 +185,13 @@ class KlipperPlugin(
             custom_bindings=True,
             icon="rocket",
             replaces= "connection" if self._settings.get_boolean(["connection", "replace_connection_panel"]) else ""
+         ),
+         dict(
+            type="tab",
+            name="Graph",
+            template="klipper_tab_graph.jinja2",
+            suffix="_graph",
+            custom_bindings=True
          )
       ]
    
@@ -193,10 +200,12 @@ class KlipperPlugin(
    def get_assets(self):
       return dict(
          js=["js/klipper.js",
-              "js/klipper_settings.js",
-              "js/klipper_leveling.js",
-              "js/klipper_pid_tuning.js",
-              "js/klipper_offset.js"],
+             "js/klipper_settings.js",
+             "js/klipper_leveling.js",
+             "js/klipper_pid_tuning.js",
+             "js/klipper_offset.js",
+             "js/klipper_graph.js"
+         ],
          css=["css/klipper.css"],
          less=["css/klipper.less"]
       )
