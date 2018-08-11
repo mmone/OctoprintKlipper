@@ -4,7 +4,10 @@ import datetime
 import logging
 import octoprint.plugin
 import octoprint.plugin.core
+import glob
+import os
 from octoprint.util.comm import parse_firmware_line
+from . import KlipperLogAnalyzer
 import flask
 
 class KlipperPlugin(
@@ -12,6 +15,7 @@ class KlipperPlugin(
       octoprint.plugin.TemplatePlugin,
       octoprint.plugin.SettingsPlugin,
       octoprint.plugin.AssetPlugin,
+      octoprint.plugin.SimpleApiPlugin,
       octoprint.plugin.EventHandlerPlugin):
    
    _parsing_response = False
@@ -194,10 +198,9 @@ class KlipperPlugin(
             replaces= "connection" if self._settings.get_boolean(["connection", "replace_connection_panel"]) else ""
          ),
          dict(
-            type="tab",
-            name="Graph",
-            template="klipper_tab_graph.jinja2",
-            suffix="_graph",
+            type="generic",
+            name="Performance Graph",
+            template="klipper_graph_dialog.jinja2",
             custom_bindings=True
          )
       ]
@@ -254,6 +257,34 @@ class KlipperPlugin(
             self.logError(msg)
       return line
 
+   def get_api_commands(self):
+      return dict(
+         listLogFiles=[],
+         getStats=["logFile"]
+      )
+      
+   def on_api_command(self, command, data):
+      if command == "listLogFiles":
+         files = []
+         for f in glob.glob("/tmp/*.log*"):
+            filesize = os.path.getsize(f)
+            files.append(dict(
+               name=os.path.basename(f) + " ({:.1f} KB)".format(filesize / 1000.0),
+               file=f,
+               size=filesize
+            ))
+         return flask.jsonify(data=files)
+      elif command == "getStats":
+         if "logFile" in data:
+            log_analyzer = KlipperLogAnalyzer.KlipperLogAnalyzer(data["logFile"])
+            
+            return log_analyzer.analyze()
+            
+   def on_api_get(self, request):
+      log_analyzer = KlipperLogAnalyzer.KlipperLogAnalyzer("/tmp/klippy.log.2018-08-06")
+      
+      return log_analyzer.analyze()
+        
    def get_update_information(self):
       return dict(
          klipper=dict(

@@ -36,6 +36,15 @@ $(function() {
             });;
         }
         
+        self.showGraphDialog = function() {
+           var dialog = $("#klipper_graph_dialog");
+           dialog.modal({
+                show: 'true',
+                backdrop: 'static',
+                keyboard: false
+            });;
+        }
+        
         self.executeMacro = function(macro) {	
            OctoPrint.control.sendGcode(macro.macro());	
         }
