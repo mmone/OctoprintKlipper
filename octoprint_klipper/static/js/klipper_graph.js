@@ -8,11 +8,28 @@ function KlipperGraphViewModel(parameters) {
       "cache-control": "no-cache"
    }
    
-   self.apiUrl = "http://corexy.local/api/plugin/klipper"
+   self.apiUrl = "/api/plugin/klipper"
+   
    self.availableLogFiles = ko.observableArray();
    self.logFile = ko.observable();
+   self.status = ko.observable();
+   self.datasets = ko.observableArray();
+   self.canvas;
+   self.canvasContext;
+   self.chart;
+   self.datasetFill = ko.observable(false);
    
    self.onStartup = function() {
+      self.canvas = $("#klipper_graph_canvas")[0]
+      self.canvasContext = self.canvas.getContext("2d");
+      
+      Chart.defaults.global.elements.line.borderWidth=1;
+      Chart.defaults.global.elements.line.fill= false;
+      Chart.defaults.global.elements.point.radius= 0;
+      
+      var myChart = new Chart(self.canvas, {
+         type: "line"
+      });
       self.listLogFiles();
    }
    
@@ -27,8 +44,29 @@ function KlipperGraphViewModel(parameters) {
       }
       
       $.ajax(settings).done(function (response) {
+         self.availableLogFiles.removeAll();
          self.availableLogFiles(response["data"]);
       });
+   }
+   
+   self.saveGraphToPng = function() {
+      button =  $('#download-btn');
+      var dataURL = self.canvas.toDataURL("image/png");//.replace("image/png", "image/octet-stream");
+      button.attr("href", dataURL);
+   }
+   
+   self.toggleDatasetFill = function() {
+      if(self.datasets) {
+         for (i=0; i < self.datasets().length; i++) {
+            self.datasets()[i].fill = self.datasetFill();
+         }
+         self.chart.update();
+      }
+      return true
+   }
+   
+   self.convertTime = function(val) {
+      return moment(val, "X");
    }
    
    self.loadData = function() {
@@ -48,87 +86,86 @@ function KlipperGraphViewModel(parameters) {
       }
 
       $.ajax(settings).done(function (response) {
-         //console.log(response.times);
-
-         ctx = $("#klipper_graph_canvas")[0].getContext("2d");
-         var myChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-               labels: response.times,
-               datasets: [
-                  {
-                     label: "MCU Load",
-                     backgroundColor: "rgba(75, 75, 75, 0.5)",
-                     borderColor: "rgb(75, 75, 75)",
-                     fill: false,
-                     pointRadius: 0,
-                     borderColor: "#FF0000",
-                     borderWidth: 1,
-                     data: response.loads
-                  },
-                  {
-                     label: "Bandwith",
-                     backgroundColor: "rgba(75, 192, 192, 0.5)",
-                     borderColor: "rgb(75, 192, 192)",
-                     fill: false,
-                     pointRadius: 0,
-                     borderWidth: 1,
-                     data: response.bwdeltas
-                  },
-                  {
-                     label: "Hostbuffers",
-                     backgroundColor: "rgba(54, 162, 235, 0.5)",
-                     borderColor: "rgb(54, 162, 235)",
-                     fill: false,
-                     pointRadius: 0,
-                     borderWidth: 1,
-                     data: response.buffers
-                  },
-                  {
-                     label: "Awake",
-                     backgroundColor: "rgba(255, 99, 132, 0.5)",
-                     borderColor: "rgb(255, 99, 132",
-                     fill: false,
-                     pointRadius: 0,
-                     borderWidth: 1,
-                     data: response.awake
-                  }
-               ]
-            },
-            options: {
-               elements:{
-                  line: {
-                     tension: 0
-                  }
+         self.status("")
+         self.datasetFill(false);
+         if("error" in response) {
+            self.status(response.error);
+         } else {
+            self.datasets.removeAll();
+            self.datasets.push(
+            {
+               label: "MCU Load",
+               backgroundColor: "rgba(199, 44, 59, 0.5)",
+               borderColor: "rgb(199, 44, 59)",
+               data: response.loads
+            });
+            
+            self.datasets.push(
+            {
+               label: "Bandwith",
+               backgroundColor: "rgba(255, 130, 1, 0.5)",
+               borderColor: "rgb(255, 130, 1)",
+               data: response.bwdeltas
+            });
+            
+            self.datasets.push(
+            {
+               label: "Host Buffer",
+               backgroundColor: "rgba(0, 145, 106, 0.5)",
+               borderColor: "rgb(0, 145, 106)",
+               data: response.buffers
+            });
+            
+            self.datasets.push(
+            {
+               label: "Awake Time",
+               backgroundColor: "rgba(33, 64, 95, 0.5)",
+               borderColor: "rgb(33, 64, 95)",
+               data: response.awake
+            });
+         
+            self.chart = new Chart(self.canvas, {
+               type: "line",
+               data: {
+                  labels: response.times,
+                  datasets: self.datasets()
                },
-               scales: {
-                  xAxes: [{
-                     type: 'time',
-                     distribution: "linear",
-                     time: {
-                        parser: "X",
-                        displayFormats: {
-                           millisecond: "HH:mm:ss",
-                           second: 'HH:mm:ss',
-                           minute: 'HH:mm:ss'
+               options: {
+                  elements:{
+                     line: {
+                        tension: 0
+                     }
+                  },
+                  scales: {
+                     xAxes: [{
+                        type: 'time',
+                        time: {
+                           parser:  self.convertTime,
+                           tooltipFormat: "HH:mm",
+                           displayFormats: {
+                              minute: "HH:mm",
+                              second: "HH:mm",
+                              millisecond: "HH:mm"
+                           }
                         },
-                        tooltipFormat: "HH:mm:ss"
-                     },
-                     scaleLabel: {
-                        display: true,
-                        labelString: 'Time'
-                     }
-                  }],
-                  yAxes: [{
-                     scaleLabel: {
-                        display: true,
-                        labelString: '%'
-                     }
-                  }]
+                        scaleLabel: {
+                           display: true,
+                           labelString: 'Time'
+                        }
+                     }],
+                     yAxes: [{
+                        scaleLabel: {
+                           display: true,
+                           labelString: '%'
+                        }
+                     }]
+                  },
+                  legend: {
+                     
+                  }
                }
-            }
-         });
-        
+            });
+         }
       });
    }
 }

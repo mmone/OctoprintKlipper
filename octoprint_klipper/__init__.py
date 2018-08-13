@@ -7,7 +7,7 @@ import octoprint.plugin.core
 import glob
 import os
 from octoprint.util.comm import parse_firmware_line
-from . import KlipperLogAnalyzer
+from .modules import KlipperLogAnalyzer
 import flask
 
 class KlipperPlugin(
@@ -277,8 +277,7 @@ class KlipperPlugin(
       elif command == "getStats":
          if "logFile" in data:
             log_analyzer = KlipperLogAnalyzer.KlipperLogAnalyzer(data["logFile"])
-            
-            return log_analyzer.analyze()
+            return flask.jsonify(log_analyzer.analyze())
             
    def on_api_get(self, request):
       log_analyzer = KlipperLogAnalyzer.KlipperLogAnalyzer("/tmp/klippy.log.2018-08-06")

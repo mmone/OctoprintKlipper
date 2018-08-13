@@ -14,18 +14,17 @@ class KlipperLogAnalyzer():
    def __init__(self, log_file):
       self.log_file = log_file
 
-      
    def analyze(self):
       data = self.parse_log(self.log_file, None)
       if not data:
-          return
+         result = dict(error= "Couldn't parse \"{}\"".format(self.log_file))
+      else:
+         result = self.plot_mcu(data, self.MAXBANDWIDTH)
       #if options.frequency:
       #    plot_frequency(data, outname, options.mcu)
       #    return
-      json = flask.jsonify(self.plot_mcu(data, self.MAXBANDWIDTH))
-      
-      return json
-      
+      return result
+
    def parse_log(self, logname, mcu):
       if mcu is None:
          mcu = "mcu"
@@ -59,7 +58,7 @@ class KlipperLogAnalyzer():
          out.append(keyparts)
       f.close()
       return out
-      
+
    def find_print_restarts(self, data):
       runoff_samples = {}
       last_runoff_start = last_buffer_time = last_sampletime = 0.
@@ -144,7 +143,7 @@ class KlipperLogAnalyzer():
                            key.endswith(":freq") or key.endswith(":adj")))) }
       basetime = lasttime = data[0]['#sampletime']
       for d in data:
-         st = datetime.datetime.utcfromtimestamp(d['#sampletime'])
+         st = d['#sampletime']
          for key, (times, values) in graph_keys.items():
             val = d.get(key)
             if val not in (None, '0', '1'):

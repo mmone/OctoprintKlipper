@@ -40,8 +40,14 @@
    font-family: monospace;
 }
 
-#klipper_graph_canvas {
-   -moz-user-select: none;
-   -webkit-user-select: none;
-   -ms-user-select: none;
+#klipper_graph_dialog form {
+	margin: 0;
+}
+
+#klipper_graph_dialog .graph-footer {
+   bottom:0;
+}
+
+#klipper_graph_dialog input {
+   display: inline-block;
 }
