@@ -58,7 +58,9 @@ $(function() {
            
            if (macro.macro().match(paramObjRegex) == null) {
               OctoPrint.control.sendGcode(
-                 macro.macro().replace(/(?:\r\n|\r|\n)/g, " ")
+                 // Use .split to create an array of strings which is sent to 
+                 // OctoPrint.control.sendGcode instead of a single string.
+                 macro.macro().split(/\r\n|\r|\n/)
               );
            } else {
               self.paramMacroViewModel.process(macro);

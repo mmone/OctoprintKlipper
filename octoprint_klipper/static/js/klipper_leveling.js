@@ -58,19 +58,18 @@ $(function() {
         }
         */
         self.moveToPosition = function(x, y) {
-           OctoPrint.control.sendGcode( 
+           OctoPrint.control.sendGcode([
+              // Move Z up 
               "G1 Z" + (self.settings.settings.plugins.klipper.probe.height() * 1 + 
               self.settings.settings.plugins.klipper.probe.lift()*1) +
-              " F" + self.settings.settings.plugins.klipper.probe.speed_z()
-           );
-           OctoPrint.control.sendGcode(
+              " F" + self.settings.settings.plugins.klipper.probe.speed_z() ,
+              // Move XY
               "G1 X" + x + " Y" + y +
-              " F" + self.settings.settings.plugins.klipper.probe.speed_xy()
-           );
-           OctoPrint.control.sendGcode(
+              " F" + self.settings.settings.plugins.klipper.probe.speed_xy() ,
+              // Move Z down
               "G1 Z" + self.settings.settings.plugins.klipper.probe.height() +
                " F" + self.settings.settings.plugins.klipper.probe.speed_z()
-           );
+           ]);
         }
         
         self.moveToPoint = function(index) {

@@ -1,8 +1,22 @@
-# OctoPrint Klipper Plugin
+## Fork information:
+- This is forked from [the original](https://github.com/mmone/OctoprintKlipperPlugin) version 0.2.5
+- The current version is 0.2.5-JEL-0.1 and includes modified versions of:
+  - klipper.js
+  - klipper_param_macro.js
+  - klipper_leveling.js
+- Changes made result in multiple GCode commands being sent to OctoPrint.control.sendGcode as an array of strings instead of separate strings or as strings with line breaks or other formatting.  This results in the commands being received in the intended order and interpreted correctly. 
 
+## Fork Installation Information:
+- Uninstall any other versions of the plugin using Plugin Manager or other means, as necessary.
+- Install this version by using Plugin Manager's "From Url" option and entering this URL:
+`https://github.com/jameseleach/OctoprintKlipperPlugin/archive/JEL-0.1.zip`
+
+Original contents follow...
+
+# OctoPrint Klipper Plugin
 This plugin assists in managing and monitoring the [Klipper](https://github.com/KevinOConnor/klipper) 3D printer firmware.
 
-### Features
+## Features
 - Simplified connection dialog.
 - Restart Host and MCU processes.
 - User defineable macro buttons with optional parameter dialogs.

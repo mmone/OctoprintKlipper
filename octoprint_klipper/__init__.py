@@ -92,6 +92,10 @@ class KlipperPlugin(
             filepath = os.path.expanduser(
                self._settings.get(["configuration", "path"])
             )
+            # Check for Unicode config file and convert to String, if so.
+            if type(data["config"]) == unicode:
+               data["config"] = data["config"].encode('utf-8')
+
             f = open(filepath, "w")
             f.write(data["config"])
             f.close()
