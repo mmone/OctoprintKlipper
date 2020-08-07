@@ -60,7 +60,14 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
             "#known_driver_type": [{
                 token: "support.type",
                 regex: /\btmc(?:2130|2208|2209|2660|5160)\b/,
-                caseInsensitive: true
+                caseInsensitive: true,
+                push: [{
+                    token: "text",
+                    regex: /(?=(\]))/,
+                    next: "pop"
+                }, {
+                    defaultToken: "keyword.control"
+                }]
             }],
             "#known_thermistor_type": [{
                 token: "support.type",
