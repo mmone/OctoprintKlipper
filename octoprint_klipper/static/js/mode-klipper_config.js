@@ -16,7 +16,7 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
             }, {
                 include: "#number"
             }, {
-                include: "#gcode_line"
+                include: "#config_line_start_gcode"
             }],
             "#single_line_comment": [{
                 token: "comment.line.number-sign",
@@ -95,9 +95,22 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
                 regex: /(?<![\w\d])[\^~!]*(?:z:)?[a-z]{1,2}\d{1,2}(?:\.\d{1,2})?/,
                 caseInsensitive: true
             }],
+            "#config_line_start_gcode": [{
+                token: ["variable.name", "text"],
+                regex: /^(gcode)(\s*[:=]\s*)/,
+                push: [{
+                    token: "text",
+                    regex: /(?=(\[))/,
+                    next: "start"
+                }, {
+                    include: "#gcode_line"
+                }, {
+                    include: "#single_line_comment"
+                }]
+            }],
             "#config_line": [{
                 token: ["variable.name", "text"],
-                regex: /^(\w+)(\s*[:=]\s*)/,
+                regex: /^(?!(gcode))(\w+)(\s*[:=]\s*)/,
                 push: [{
                     token: "text",
                     regex: /$/,
@@ -378,5 +391,3 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
                             }
                         });
                     })();
-    
-    
