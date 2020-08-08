@@ -211,9 +211,9 @@ WRITE_FILE={label:Write to File, default:0, options:0|1}
         }
 
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.min.js" type="text/javascript" charset="utf-8"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/theme-monokai.min.js" type="text/javascript" charset="utf-8"></script>
-    <script src="plugin/klipper/static/js/mode-klipper_config.js" type="text/javascript"></script>
+    <script src="plugin/klipper/static/js/lib/ace/ace.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="plugin/klipper/static/js/lib/ace/theme-monokai.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="plugin/klipper/static/js/lib/ace/mode-klipper_config.js" type="text/javascript"></script>
     <input id="hdnLoadKlipperConfig" type="hidden" data-bind="value: configBound(settings.settings.plugins.klipper.config)" />
     <div id="plugin-klipper-config"></div>
     <script>
@@ -246,7 +246,7 @@ WRITE_FILE={label:Write to File, default:0, options:0|1}
             return obKlipperConfig;
         }
 
-        ace.config.set("basePath", "https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/");
+        ace.config.set("basePath", "plugin/klipper/static/js/lib/ace/");
         editor = ace.edit("plugin-klipper-config");
         editor.setTheme("ace/theme/monokai");
         editor.session.setMode("ace/mode/klipper_config");
