@@ -99,7 +99,7 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
                 caseInsensitive: true
             }, {
                 token: "support.type",
-                regex: /(?<![\w\d])[\^~!]*(?:z:)?[a-z]{1,2}\d{1,2}(?:\.\d{1,2})?/,
+                regex: /(?:\b)[\^~!]*(?:z:)?[a-z]{1,2}\d{1,2}(?:\.\d{1,2})?/,
                 caseInsensitive: true
             }],
             "#config_line_start_gcode": [{
@@ -173,7 +173,7 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
                 caseInsensitive: true,
                 push: [{
                     token: "text",
-                    regex: /(\s|$)/,
+                    regex: /(?=(\s|$))/,
                     next: "pop"
                 }, {
                     include: "#number"
