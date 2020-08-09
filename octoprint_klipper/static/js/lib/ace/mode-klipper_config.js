@@ -37,6 +37,24 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
                 regex: /\b(?:true|false)\b/,
                 caseInsensitive: true
             }],
+            "#string-single": [{
+                token: "text",
+                regex: /'/,
+                push: [{
+                    token: "text",
+                    regex: /'/,
+                    next: "pop"
+                }]
+            }],
+            "#string-double": [{
+                token: "text",
+                regex: /"/,
+                push: [{
+                    token: "text",
+                    regex: /"/,
+                    next: "pop"
+                }]
+            }],
             "#config_block": [{
                 token: "text",
                 regex: /^\[/,
@@ -177,6 +195,10 @@ ace.define("ace/mode/klipper_config_highlight_rules",[], function(require, expor
                     next: "pop"
                 }, {
                     include: "#number"
+                }, {
+                    include: "#string-single"
+                }, {
+                    include: "#string-double"
                 }, {
                     include: "#gcode_macro_block"
                 }]
