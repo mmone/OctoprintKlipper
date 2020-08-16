@@ -183,7 +183,88 @@ WRITE_FILE={label:Write to File, default:0, options:0|1}
   <!-- Klipper Conf -->
   <div class="tab-pane" id="conf">
    <div class="control-group">
-      <textarea id="plugin-klipper-config" rows="31" class="block" data-bind="value: settings.settings.plugins.klipper.config"></textarea>
+    <style type="text/css" media="screen">
+
+        #plugin-klipper-config {
+          height: 100%;
+        }
+
+        #settings_plugin_klipper {
+          height: 100%;
+        }
+
+        #settings_plugin_klipper form {
+          height: 100%;
+        }
+
+        #settings_plugin_klipper form .tab-content {
+          height: 100%;
+          overflow: auto;
+        }
+
+        #settings_plugin_klipper form .tab-content .tab-pane {
+          height: 100%;
+        }
+
+        #settings_plugin_klipper form .tab-content .tab-pane .control-group {
+          max-height: 1200px;
+        }
+
+    </style>
+    <script src="plugin/klipper/static/js/lib/ace/ace.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="plugin/klipper/static/js/lib/ace/theme-monokai.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="plugin/klipper/static/js/lib/ace/mode-klipper_config.js" type="text/javascript"></script>
+    <input id="hdnLoadKlipperConfig" type="hidden" data-bind="value: configBound(settings.settings.plugins.klipper.config)" />
+    <div id="plugin-klipper-config"></div>
+    <script>
+
+        var obKlipperConfig = null;
+        var editor = null;
+
+        function configBound(config) {
+            config.withSilence = function() {
+              this.notifySubscribers = function() {
+                if (!this.isSilent) {
+                  ko.subscribable.fn.notifySubscribers.apply(this, arguments);
+                }
+              };
+
+              this.silentUpdate = function(newValue) {
+                this.isSilent = true;
+                this(newValue);
+                this.isSilent = false;
+              };
+
+              return this;
+            };
+
+            obKlipperConfig = config.withSilence();
+            if (editor) {
+              editor.setValue(obKlipperConfig());
+              editor.clearSelection();
+            }
+            return obKlipperConfig;
+        }
+
+        ace.config.set("basePath", "plugin/klipper/static/js/lib/ace/");
+        editor = ace.edit("plugin-klipper-config");
+        editor.setTheme("ace/theme/monokai");
+        editor.session.setMode("ace/mode/klipper_config");
+        editor.setOptions({
+          autoScrollEditorIntoView: true,
+          maxLines: "Infinity"
+        });
+
+        editor.session.on('change', function(delta) {
+          if (obKlipperConfig) {
+              obKlipperConfig.silentUpdate(editor.getValue());
+          }
+        });
+
+        // Uncomment this if not using maxLines: "Infinity"...
+        // setInterval(function(){ editor.resize(); }, 500);
+
+    </script>
    </div>
   </div>
 </div>
